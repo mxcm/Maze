@@ -7,24 +7,41 @@ class Maze{
 
         this.seed = seed;
         this.mazeSize = mazeSize;
+        this.canvas = canvas;
 
         this.maze = new Array(mazeSize);
-        this.genertate();
-        this.draw(canvas);
 
-        for(let row of this.maze){
-            console.log(row);
-        }
+        this.genertate();
+        this.draw();
+        this.drawSolution();
     }
 
-    draw(canvas){
-        let width = canvas.width;
-        let ctx = canvas.getContext("2d");
-
-        let gridSize = width / this.mazeSize;
+    drawSolution() {
+        let width = this.canvas.width;
+        let ctx = this.canvas.getContext("2d");
+        let gridSize = Math.floor(width / this.mazeSize);
+        let halfGrid = Math.floor(gridSize / 2);
 
         ctx.beginPath();
+        ctx.strokeStyle = "#ff0000";
+        ctx.moveTo(halfGrid, halfGrid);
+        for(let pos of this.solution){
+            let x = pos[0], y = pos[1];
+            let px = x * gridSize + halfGrid, py = y * gridSize + halfGrid;
+            ctx.lineTo(py, px);
+        }
+        ctx.stroke();
+    }
 
+    draw(){
+        let width = this.canvas.width;
+        let ctx = this.canvas.getContext("2d");
+        //ctx.strokeStyle = "#009A41";
+
+        let gridSize = Math.floor(width / this.mazeSize);
+
+        ctx.beginPath();
+        ctx.strokeStyle = "#000";
         //ctx.moveTo(0, gridSize);
         for(let row = 0; row < this.mazeSize; row++){
             for(let col = 0; col < this.mazeSize; col++){
@@ -67,6 +84,17 @@ class Maze{
                 visitCount++;
             }
 
+            // Save the path that lead to solution from the start at 0,0.
+            if(pos[0] === this.mazeSize - 1 && pos[1] === this.mazeSize - 1 && this.solution === undefined){
+                let solution = [];
+                for(let p of stack){
+                    solution.push(p);
+                }
+                // push the goal.
+                solution.push([this.mazeSize - 1, this.mazeSize - 1]);
+                this.solution = solution;
+            }
+
             let brokenWall = this._breakRandomWall(pos, visited);
             if(brokenWall === false){
                 pos = stack.pop();
@@ -94,7 +122,6 @@ class Maze{
                     // break walls for both current block and its neighbor
                     this.maze[row][col] ^= dir;
                     this.maze[neighborPos[0]][neighborPos[1]] ^= this._getOppositeDir(dir);
-                    // console.log(dir);
                     return neighborPos;
                 }
             }
