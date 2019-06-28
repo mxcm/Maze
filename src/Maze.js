@@ -1,5 +1,5 @@
 class Maze{
-    constructor(seed, mazeSize, canvas){
+    constructor(seed, mazeSize){
         this.LEFT = 0b0001; 
         this.UP = 0b0010;
         this.RIGHT = 0b0100;
@@ -7,18 +7,15 @@ class Maze{
 
         this.seed = seed;
         this.mazeSize = mazeSize;
-        this.canvas = canvas;
 
         this.maze = new Array(mazeSize);
 
         this.genertate();
-        this.draw();
-        this.drawSolution();
     }
 
-    drawSolution() {
-        let width = this.canvas.width;
-        let ctx = this.canvas.getContext("2d");
+    drawSolution(solution) {
+        let width = solution.width;
+        let ctx = solution.getContext("2d");
         let gridSize = Math.floor(width / this.mazeSize);
         let halfGrid = Math.floor(gridSize / 2);
 
@@ -33,9 +30,9 @@ class Maze{
         ctx.stroke();
     }
 
-    draw(){
-        let width = this.canvas.width;
-        let ctx = this.canvas.getContext("2d");
+    draw(canvas){
+        let width = canvas.width;
+        let ctx = canvas.getContext("2d");
         //ctx.strokeStyle = "#009A41";
 
         let gridSize = Math.floor(width / this.mazeSize);

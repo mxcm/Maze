@@ -6,7 +6,7 @@ import Grid from './grid';
 function App() {
   return (
     <div className="App">
-      <Grid seed='20' size='10' />
+      <Grid seed='225' size='15' />
     </div>
   );
 }

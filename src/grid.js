@@ -8,12 +8,18 @@ class Grid extends React.Component{
         let canvasSize = props.size * 25 > 600 ? 600 : props.size * 25;
         this.state = {
             canvasSize: canvasSize,
+            showSolution: false,
         }
         this.onkeydown = this.onkeydown.bind(this);
+
+
     }
     componentDidMount(){
         const canvas = this.refs.canvas;
-        new Maze(this.props.seed, this.props.size, canvas);
+        const solution = this.refs.solution;
+        const maze = new Maze(this.props.seed, this.props.size);
+        maze.draw(canvas);
+        maze.drawSolution(solution);
         document.addEventListener("keydown", this.onkeydown)
     }
 
@@ -34,16 +40,36 @@ class Grid extends React.Component{
         }
     }
 
-    style_canvas = {
+    style_div = () => ({
+        position: "relative",
+        width: this.state.canvasSize,
+        height: this.state.canvasSize,
+    });
+
+    style_canvas = () => ({
+        position: "absolute",
+        // top: "0px",
+        // left: "0px",
         border: "2px solid #000000",
-        color: "#000000"
-    };
+        color: "#000000",
+        // width: this.state.canvasSize,
+        // height: this.state.canvasSize
+    });
+
+    style_solution = () => ({
+        display: this.state.showSolution ? "inline" : "none",
+        position: "absolute",
+        border: "2px solid #000000",
+        color: "#000000",
+    });
 
     render() {
         let {canvasSize} = this.state;
         return(
-            <canvas ref="canvas" width={canvasSize} height={canvasSize} style={this.style_canvas}/>
-            // <canvas ref="canvas" width={canvasSize} height={canvasSize} style={this.style_canvas} />
+            <div style={this.style_div()}>
+                <canvas ref="canvas" width={canvasSize} height={canvasSize} style={this.style_canvas()} />
+                <canvas ref="solution" width={canvasSize} height={canvasSize} style={this.style_solution()} />
+            </div>
         );
     }
 }
