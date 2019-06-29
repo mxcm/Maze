@@ -5,7 +5,8 @@ import Controller from './components/Controller';
 function App() {
   return (
     <div className="App">
-      <Controller mazeSize="50" />
+      <h3>Maze for 灿灿</h3>
+      <Controller mazeSize="5" />
     </div>
   );
 }

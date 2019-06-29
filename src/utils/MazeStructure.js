@@ -1,13 +1,9 @@
+import {LEFT, RIGHT, UP, DOWN} from './Directions';
+
 class MazeWalls{
-    constructor(seed, mazeSize, dirs){
+    constructor(seed, mazeSize){
         this.seed = seed;
         this.mazeSize = mazeSize;
-
-        this.LEFT = dirs.LEFT;
-        this.RIGHT = dirs.RIGHT;
-        this.UP = dirs.UP;
-        this.DOWN = dirs.DOWN;
-
         this.maze = new Array(mazeSize);
         this.solution = [];
 
@@ -27,7 +23,7 @@ class MazeWalls{
         let visited = {};
 
         // value equals to 0b1111
-        let fourWall = this.LEFT | this.UP | this.RIGHT | this.DOWN;
+        let fourWall = LEFT | UP | RIGHT | DOWN;
 
         // Create a maze where every block has four walls.
         for(let i = 0; i < this.mazeSize; i++){
@@ -71,7 +67,7 @@ class MazeWalls{
         let walls = this.maze[row][col];
         // If this position has walls
         if(walls > 0){
-            let dirs = [this.LEFT, this.UP, this.RIGHT, this.DOWN];
+            let dirs = [LEFT, UP, RIGHT, DOWN];
             this._shuffleArray(dirs);
             let row = pos[0]
 
@@ -92,19 +88,19 @@ class MazeWalls{
 
     _getOppositeDir(dir){
         switch(dir) {
-            case this.LEFT: return this.RIGHT;
-            case this.RIGHT: return this.LEFT;
-            case this.UP: return this.DOWN;
-            case this.DOWN: return this.UP;
+            case LEFT: return RIGHT;
+            case RIGHT: return LEFT;
+            case UP: return DOWN;
+            case DOWN: return UP;
             default: return null;
         }
     }
 
     _getNeighbor(pos, dir){
         let x = pos[0], y = pos[1];
-        if(dir === this.LEFT) y--;
-        else if(dir === this.RIGHT) y++;
-        else if(dir === this.UP) x--;
+        if(dir === LEFT) y--;
+        else if(dir === RIGHT) y++;
+        else if(dir === UP) x--;
         else x++;
 
         if(x < 0 || x >= this.mazeSize || y < 0 || y >= this.mazeSize){

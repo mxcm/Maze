@@ -1,68 +1,62 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import MazeWalls from '../utils/MazeStructure';
+import Player from './Player';
+
+import {LEFT, RIGHT, UP, DOWN} from '../utils/Directions';
 
 class Maze extends React.Component{
     constructor(props){
         super(props);
-
         let canvasSize = props.mazeSize * 25 > 600 ? 600 : props.mazeSize * 25;
+
+        let mazewalls = new MazeWalls(this.props.seed, this.props.mazeSize);
+        let {maze, solution} = mazewalls.getMaze();
+
+        let squareSize = Math.floor(canvasSize / this.props.mazeSize);
+
         this.state = {
             canvasSize: canvasSize,
             showSolution: false,
-        }
-    }
-
-    getMazeWalls(){
-        let dirs = {
-            LEFT: 0b0001,
-            UP: 0b0010,
-            RIGHT: 0b0100,
-            DOWN: 0b1000
-        }
-
-        let mazewalls = new MazeWalls(this.props.seed, this.props.mazeSize, dirs);
-        let {maze, solution} = mazewalls.getMaze();
-
-        console.log("getWalls:", maze);
-        return {
             maze: maze,
             solution: solution,
-            dirs: dirs
+            squareSize: squareSize
         }
+
+        this.getCenter = this.getCenter.bind(this);
     }
 
     componentDidMount(){
-        let {maze, solution, dirs}  = this.getMazeWalls();
+        let {maze, solution}  = this.state;
 
         const mazeCanvas = this.refs.mazeCanvas;
         const solutionCanvas = this.refs.solutionCanvas;
-        this.draw(mazeCanvas, maze, dirs);
+        this.draw(mazeCanvas, maze);
         if(this.state.showSolution){
             this.drawSolution(solutionCanvas, solution);
         }
     }
 
-    draw(mazeCanvas, maze, dirs){
+    draw(mazeCanvas, maze){
         let width = mazeCanvas.width;
         let ctx = mazeCanvas.getContext("2d");
         let mazeSize = this.props.mazeSize;
 
-        let gridSize = Math.floor(width / mazeSize);
+        let squareSize = this.state.squareSize;
 
         ctx.beginPath();
         ctx.strokeStyle = "#000";
-        //ctx.moveTo(0, gridSize);
+
         for(let row = 0; row < mazeSize; row++){
             for(let col = 0; col < mazeSize; col++){
                 let wall = maze[row][col];
-                if((wall & dirs.RIGHT) > 0) {
-                    ctx.moveTo((col + 1) * gridSize, row * gridSize);
-                    ctx.lineTo((col + 1) * gridSize, (row + 1) * gridSize);
+                if((wall & RIGHT) > 0) {
+                    ctx.moveTo((col + 1) * squareSize, row * squareSize);
+                    ctx.lineTo((col + 1) * squareSize, (row + 1) * squareSize);
                 }
-                if((wall & dirs.DOWN) > 0) {
-                    ctx.moveTo(col * gridSize, (row + 1) * gridSize);
-                    ctx.lineTo((col + 1) * gridSize, (row + 1) * gridSize);
+                if((wall & DOWN) > 0) {
+                    ctx.moveTo(col * squareSize, (row + 1) * squareSize);
+                    ctx.lineTo((col + 1) * squareSize, (row + 1) * squareSize);
                 }
             }
         }
@@ -72,18 +66,29 @@ class Maze extends React.Component{
     drawSolution(solutionCanvas, solution) {
         let width = solutionCanvas.width;
         let ctx = this.solutionCanvas.getContext("2d");
-        let gridSize = Math.floor(width / this.props.mazeSize);
-        let halfGrid = Math.floor(gridSize / 2);
+        let squareSize = this.state.squareSize;
+        let halfSquare = Math.floor(squareSize / 2);
 
         ctx.beginPath();
         ctx.strokeStyle = "#ff0000";
-        ctx.moveTo(halfGrid, halfGrid);
+        ctx.moveTo(halfSquare, halfSquare);
         for(let pos of solution){
             let x = pos[0], y = pos[1];
-            let px = x * gridSize + halfGrid, py = y * gridSize + halfGrid;
+            let px = x * squareSize + halfSquare, py = y * squareSize + halfSquare;
             ctx.lineTo(py, px);
         }
         ctx.stroke();
+    }
+
+
+    getCenter(pos) {
+        let squareSize = this.state.squareSize;
+        let halfSquare = Math.floor(squareSize / 2);
+
+        let x = pos[0], y = pos[1];
+        let px = x * squareSize + halfSquare;
+        let py = y * squareSize + halfSquare;
+        return [px, py];
     }
 
     style_div = () => ({
@@ -96,6 +101,8 @@ class Maze extends React.Component{
         position: "absolute",
         border: "2px solid #000000",
         color: "#000000",
+        left: 0,
+        top: 0,
     });
 
     style_solution = () => ({
@@ -103,6 +110,8 @@ class Maze extends React.Component{
         position: "absolute",
         border: "2px solid #000000",
         color: "#000000",
+        left: 0,
+        top: 0
     });
 
 
@@ -112,7 +121,7 @@ class Maze extends React.Component{
             <div style={this.style_div()}>
                 <canvas ref="mazeCanvas" width={canvasSize} height={canvasSize} style={this.style_canvas()} />
                 <canvas ref="solutionCanvas" width={canvasSize} height={canvasSize} style={this.style_solution()} />
-                {/* {this.props.player} */}
+                <Player playerID={1} playerColor="#9370db" MazeBoard={this.state.maze} getCenter={this.getCenter} />
             </div>
         );
     }
