@@ -11,8 +11,6 @@ class Maze extends React.Component{
             canvasSize: canvasSize,
             showSolution: false,
         }
-
-        this.onkeydown = this.onkeydown.bind(this);
     }
 
     getMazeWalls(){
@@ -23,8 +21,7 @@ class Maze extends React.Component{
             DOWN: 0b1000
         }
 
-        let seed = Math.floor(Math.random() * 10000);
-        let mazewalls = new MazeWalls(seed, this.props.mazeSize, dirs);
+        let mazewalls = new MazeWalls(this.props.seed, this.props.mazeSize, dirs);
         let {maze, solution} = mazewalls.getMaze();
 
         console.log("getWalls:", maze);
@@ -43,29 +40,6 @@ class Maze extends React.Component{
         this.draw(mazeCanvas, maze, dirs);
         if(this.state.showSolution){
             this.drawSolution(solutionCanvas, solution);
-        }
-
-        document.addEventListener("keydown", this.onkeydown);
-    }
-
-    startNewGame(){
-        // TODO:
-    }
-
-    onkeydown(event) {
-        switch(event.keyCode) {
-            case 38: //up
-                console.log("up");
-                break;
-            case 40: // down
-                break;
-            case 37: // left
-                break;
-            case 39: // right
-                console.log("right");
-                break;
-            default:
-                return;
         }
     }
 
@@ -138,6 +112,7 @@ class Maze extends React.Component{
             <div style={this.style_div()}>
                 <canvas ref="mazeCanvas" width={canvasSize} height={canvasSize} style={this.style_canvas()} />
                 <canvas ref="solutionCanvas" width={canvasSize} height={canvasSize} style={this.style_solution()} />
+                {/* {this.props.player} */}
             </div>
         );
     }
@@ -146,5 +121,6 @@ class Maze extends React.Component{
 export default Maze;
 
 Maze.propTypes = {
-    mazeSize:PropTypes.string,
+    mazeSize:PropTypes.string.isRequired,
+    seed:PropTypes.number.isRequired,
 };
